@@ -21,9 +21,9 @@ Tested locally (`python3 -m http.server`) using the browser's Resource Timing an
 | `hero-1200.webp` | 83.0 KB | Hero image (WebP) |
 | `css/style.css` | 5.3 KB | |
 | `js/script.js` | 1.3 KB | |
-| Embedded video iframe (`youtube-nocookie.com`) | *not measurable* | Cross-origin — browser doesn't expose YouTube's internal transfer size to the embedding page. Its real cost (player JS + video stream) is entirely deferred until the visitor presses play. |
+| Embedded video iframe (`youtube-nocookie.com`) | ~1.1 MB transferred (see below) | Not visible via cross-origin Resource Timing, but directly measured in the real DevTools Network panel — see "Real network capture" below. |
 
-**Total measured page weight (desktop, everything loaded): ≈777 KB** across 8 same-origin resources, excluding the video (which is 0 bytes until played).
+**Total measured page weight (desktop, everything loaded): ≈777 KB** across 8 same-origin resources, excluding the video (which was not measurable from same-origin JavaScript alone — see the real capture below for its actual cost).
 
 **Mobile (375px, 2× device pixel ratio):**
 
@@ -39,11 +39,52 @@ Tested locally (`python3 -m http.server`) using the browser's Resource Timing an
 
 ---
 
+## Real network capture (Firefox DevTools, live site, cache disabled, no throttling)
+
+This is the single most important piece of evidence gathered for this section — it directly measures what the local Resource Timing tests above could not see: the actual cost of the embedded video.
+
+**This page's own resources (transferred / decoded size):**
+
+| Resource | Transferred | Decoded size |
+|---|---|---|
+| `gallery-1-1200.jpg` | 306.7 KB | 306.0 KB |
+| `gallery-2-1200.jpg` | 172.1 KB | 171.4 KB |
+| `gallery-3-1200.jpg` | 195.7 KB | 195.0 KB |
+| `hero-1200.webp` | 85.7 KB | 85.0 KB |
+| `timeline-1-900.jpg` | 76.1 KB | 75.3 KB |
+| `index.html` | 6.1 KB | 15.3 KB |
+| `style.css` | 2.6 KB | 5.6 KB |
+| `favicon.ico` | 3.7 KB | 3.7 KB |
+| `script.js` | 1.4 KB | 1.4 KB |
+| **Subtotal (own content)** | **≈850 KB** | **≈859 KB** |
+
+**The embedded video's supporting resources** (loaded automatically once the demo section came near-viewport — **before the Play button was even pressed**):
+
+| Resource | Transferred | Decoded size |
+|---|---|---|
+| `base.js` (YouTube player core) | 483.6 KB | **1.63 MB** |
+| `m=r78Drb` (player module) | 223.1 KB | 896.0 KB |
+| `www-player.css` | 59.0 KB | 543.7 KB |
+| `m=root,base` (script) | 160.5 KB | 469.5 KB |
+| Video subdocument (`ShubBa0KUs4`) | 61.6 KB | 150.5 KB |
+| `i.ytimg.com` thumbnail | 40.9 KB | 40.2 KB |
+| Google Fonts (×2, `.woff2`) | 70.9 KB | 69.3 KB |
+| `m=cwx9N` (player module) | 18.5 KB | 64.4 KB |
+| Google-hosted player script | 25.4 KB | 63.6 KB |
+| Misc. analytics/telemetry pings (`log_event`, `generate_204`, `GenerateIT`) | ~2 KB | negligible |
+| **Subtotal (video player chrome only, no playback yet)** | **≈1.15 MB** | **≈3.9 MB** |
+
+**This corrects an assumption made earlier in this evaluation.** The original local test (which could only see same-origin timing data) concluded the video's cost was "entirely deferred until the visitor presses play." The real network capture shows that isn't quite right: `loading="lazy"` only delays the iframe until it's *near* the viewport — at that point, the player's full UI, CSS, JavaScript bundle, and a thumbnail all load automatically, regardless of whether Play is ever pressed. Only the actual video *stream* itself (which would add several more MB) waits for a genuine click. So the video component's fixed cost — **≈1.15 MB transferred just to show the player and its "Play" button** — is larger than the rest of the entire page's own content combined (≈850 KB), and it is not fully optional the way the design rationale in Q2(a) assumed.
+
+**A secondary effect visible in the waterfall:** the three gallery images (306 KB, 172 KB, 196 KB) took an unusually long 8.6–13.7 seconds to finish downloading even with no artificial throttling applied — far slower than their file sizes alone would suggest on a normal connection. This lines up with the timeline: they were requested at the same moment the ~1.1 MB of YouTube player resources were also downloading, so the two are plausibly competing for the same connection bandwidth. This is a real, observed usability cost of the current design: loading the video player and the image gallery around the same time can slow down the images specifically because of the video's resource weight — even though the video's own visible content (the paused player) isn't yet doing anything for the user.
+
+---
+
 ## Loading behaviour
 - **Initial load fetched only 5 resources** (`timeline-1` image, `hero` image, CSS, JS, and the video iframe document) — confirming `loading="lazy"` is correctly deferring the HackWknd timeline photo (inside a `hidden` panel) and all four gallery images until they're needed.
 - Scrolling to the gallery section triggered exactly those 4 deferred images and nothing else — no over-fetching.
 - The HackWknd timeline photo only loads once that tab is actually selected, since its panel starts `hidden` — confirmed it stayed unfetched even after scrolling past the gallery.
-- The video iframe's own document loaded in ~214ms even though `loading="lazy"` is set on it, because the demo section sits close enough to the initial viewport in this test; the actual YouTube player/video stream itself does not load until the user presses play (embed default behaviour), so there's no autoplay cost.
+- **Revised finding (see real network capture above):** the video iframe's *document* loads once it nears the viewport (as expected for `loading="lazy"`), but so does its entire player UI — CSS, core JS bundle, and a thumbnail image — totalling ≈1.15 MB. Only the actual video stream data is deferred until Play is pressed. The earlier assumption that the whole video component was "free" until clicked was too optimistic — that's only true of its single biggest cost (the video stream itself), not the player UI that loads to display it.
 
 ## Responsive behaviour
 - `srcset`/`sizes` correctly select smaller candidates at narrower viewports for the hero and timeline images (see table above).
@@ -68,7 +109,9 @@ No accessibility problems were found in this pass.
 ## Critical decision: what should be modified, replaced or removed
 **Modify — extend the WebP treatment already applied to the hero image to the timeline and gallery photos.** The hero image shows WebP cutting file size by roughly 60% over the JPEG at the same dimensions (based on the Q1-style comparison already done for that image). Applying the same conversion to `timeline-1-1600.jpg` (178.3 KB) and the four gallery images (91–164 KB each) would plausibly cut total measured page weight from ~777 KB to somewhere in the 280–320 KB range, with no visible quality loss, since JPEG-to-WebP at matched quality settings is a near-free size win for photographic content. **This is independently confirmed** by the official Lighthouse audit below, which flagged "Improve image delivery" with an estimated saving of 173 KiB — the same recommendation, arrived at by a different tool.
 
-**No element causes an unacceptable cost.** Every individual image stays under 180 KB and loads lazily/responsively; the one element with a genuinely unbounded cost — the embedded video — has that cost entirely deferred until the visitor opts in by pressing play, which was the explicit design trade-off documented in Q2(a)/the media asset log (embed vs. self-host). Given that trade-off was deliberate and disclosed, it isn't flagged as a problem here.
+**Revised conclusion (updated after the real network capture): the embedded video's player UI is the one element worth reconsidering.** The original position taken here was that no element caused an unacceptable cost, since the video's real weight "wasn't measurable" locally and was assumed to be fully deferred until Play. The live network capture disproves the second half of that: ≈1.15 MB of player CSS/JS/thumbnail loads automatically once the demo section nears the viewport, regardless of whether the visitor ever presses Play — more than the entire rest of the page's own content combined (≈850 KB), and a plausible contributor to the gallery images loading unusually slowly in the same capture (see above).
+
+**Recommended fix: replace the eager `loading="lazy"` iframe with a genuine click-to-load facade** — a static thumbnail image (already available from `i.ytimg.com`, or a locally-hosted screenshot) with a play-button overlay, where the real `<iframe>` is only injected into the DOM on click. This is a well-established pattern (e.g. `lite-youtube-embed`) precisely because it defers *all* of the ≈1.15 MB, not just the video stream, until the visitor has explicitly signalled intent to watch — turning an assumed trade-off into one that's actually true. This is the single most impactful change identified in this evaluation and is recommended as the next iteration on this page, though it was not implemented within the current submission's scope.
 
 ---
 
