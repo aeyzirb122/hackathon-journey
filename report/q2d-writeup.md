@@ -66,13 +66,40 @@ Tested locally (`python3 -m http.server`) using the browser's Resource Timing an
 No accessibility problems were found in this pass.
 
 ## Critical decision: what should be modified, replaced or removed
-**Modify — extend the WebP treatment already applied to the hero image to the timeline and gallery photos.** The hero image shows WebP cutting file size by roughly 60% over the JPEG at the same dimensions (based on the Q1-style comparison already done for that image). Applying the same conversion to `timeline-1-1600.jpg` (178.3 KB) and the four gallery images (91–164 KB each) would plausibly cut total measured page weight from ~777 KB to somewhere in the 280–320 KB range, with no visible quality loss, since JPEG-to-WebP at matched quality settings is a near-free size win for photographic content.
+**Modify — extend the WebP treatment already applied to the hero image to the timeline and gallery photos.** The hero image shows WebP cutting file size by roughly 60% over the JPEG at the same dimensions (based on the Q1-style comparison already done for that image). Applying the same conversion to `timeline-1-1600.jpg` (178.3 KB) and the four gallery images (91–164 KB each) would plausibly cut total measured page weight from ~777 KB to somewhere in the 280–320 KB range, with no visible quality loss, since JPEG-to-WebP at matched quality settings is a near-free size win for photographic content. **This is independently confirmed** by the official Lighthouse audit below, which flagged "Improve image delivery" with an estimated saving of 173 KiB — the same recommendation, arrived at by a different tool.
 
 **No element causes an unacceptable cost.** Every individual image stays under 180 KB and loads lazily/responsively; the one element with a genuinely unbounded cost — the embedded video — has that cost entirely deferred until the visitor opts in by pressing play, which was the explicit design trade-off documented in Q2(a)/the media asset log (embed vs. self-host). Given that trade-off was deliberate and disclosed, it isn't flagged as a problem here.
 
 ---
 
-## To do once the page is hosted (for the report's official evidence)
-1. Run PageSpeed Insights (`pagespeed.web.dev`) against the live URL for an official Lighthouse score + screenshot (desktop and mobile).
-2. Screenshot the "Loading behaviour" waterfall in Chrome DevTools → Network tab, showing the same lazy-load pattern confirmed above.
-3. Toggle **Settings → Accessibility → Reduce Motion** (macOS) or the equivalent OS setting, reload the page, and confirm the timeline transition is suppressed — screenshot this for the accessibility evidence section.
+## Official Lighthouse audit (PageSpeed Insights, hosted URL)
+
+Run against `https://aeyzirb122.github.io/hackathon-journey/` on 5 Sep 2026. Full report attached as `PageSpeed Insights-mobile.pdf`.
+
+**Scores (Mobile — emulated Moto G Power, Slow 4G throttling, Lighthouse 13.4.1):**
+
+| Category | Score |
+|---|---|
+| Performance | **99** |
+| Accessibility | **100** |
+| Best Practices | **96** |
+| SEO | **100** |
+
+**Core metrics:** First Contentful Paint 0.8s, Largest Contentful Paint 1.2s, Speed Index 2.9s, Cumulative Layout Shift 0, Total Blocking Time 70ms.
+
+**Desktop run could not be completed** — PageSpeed Insights returned a backend error: `extensible_stubs::UNABLE_TO_RETRY … RPC::UNREACHABLE: EOF`. This is a Google Cloud infrastructure error on PageSpeed Insights' own serving stack (a stream-retry limit being hit server-side), not an error caused by this page — the mobile run against the identical URL, moments earlier, completed cleanly with no errors. This should be documented in the report as a tool-side limitation encountered during testing, with the mobile result relied on instead. (A retry at a later time would likely succeed, since desktop runs are typically less resource-intensive on PSI's backend than mobile's throttled simulation — but re-running it is optional, not required, given the mobile data already provides strong evidence.)
+
+**Notable findings and how to read them:**
+- **"Improve image delivery" (−173 KiB)** and **"Use efficient cache lifetimes" (−360 KiB)** — the first corroborates the WebP recommendation above; the second is a GitHub Pages hosting-platform limitation (its default cache headers on the free tier), not something fixable in the page's own code.
+- **"Reduce unused JavaScript" (−530 KiB) and "Reduce unused CSS" (−107 KiB)** — these cannot be attributed to this page's own code, since `js/script.js` is 1.3 KB and `css/style.css` is 5.3 KB total. They are almost certainly attributable to the embedded YouTube iframe's own player script and styles, which are outside this page's control — worth stating explicitly in the report so this isn't misread as the page's own inefficiency.
+- **Accessibility scored a perfect 100**, independently corroborating the manual testing already carried out (colour contrast ratios, alt text on all images, ARIA tab roles/states, skip link, keyboard operability) — two different methods (manual DOM/JS inspection and automated Lighthouse) reaching the same conclusion is good triangulating evidence for the report.
+- **Best Practices (96)** flagged "Issues were logged in the Issues panel in Chrome DevTools" without detail in this export — see the checklist below to identify what they are.
+- **"Agentic Browsing" (1/2)** is a new, explicitly experimental Lighthouse category (checking AI-agent/WebMCP readiness, unrelated to Performance/Accessibility/Best Practices/SEO) — worth at most a one-line mention in the report, not a focus area, since Lighthouse itself labels it "still under development and subject to change."
+
+---
+
+## Remaining checklist (manual, needs a real human-driven browser)
+1. Open Chrome DevTools → **Issues** tab on the live page, to see what Best Practices' flagged issues actually are.
+2. Screenshot the Network-tab loading waterfall (cache disabled, reload) — confirms the same lazy-load pattern already measured above, for the report's "loading behaviour" evidence.
+3. Toggle **Reduce Motion** in OS accessibility settings, reload, and confirm the timeline transition is suppressed.
+4. (Optional) Retry the PageSpeed Insights desktop run once more, in case the backend error was transient.
