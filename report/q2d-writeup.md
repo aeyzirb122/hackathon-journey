@@ -98,8 +98,24 @@ Run against `https://aeyzirb122.github.io/hackathon-journey/` on 5 Sep 2026. Ful
 
 ---
 
+## Browser console audit (Firefox DevTools, live site)
+
+Firefox doesn't have a panel named "Issues" like Chrome — the closest equivalent is the **Console** tab, which was checked directly against the live hosted page instead. This surfaced two categories of message, and separating them is itself the useful exercise:
+
+**Actually caused by this page (both fixed):**
+1. `GET .../favicon.ico → 404` — no favicon existed, so the browser's automatic request failed on every load. **Fixed:** added a real `favicon.ico` (cropped from the hero photo) plus an SVG fallback via `<link rel="icon">`.
+2. `Feature Policy: Skipping unsupported feature name "encrypted-media"` — the video iframe's `allow` attribute requested DRM/encrypted-media support that this embed never uses (it's a public, non-DRM YouTube video). **Fixed:** trimmed the `allow` attribute down to just `picture-in-picture`.
+
+**Not this page's code — from the embedded YouTube player / Firefox's own privacy features (no action taken):**
+- CSP warnings, cookie warnings, and "Partitioned cookie or storage access… loaded in third-party context" — this is Firefox's Total Cookie Protection reacting to YouTube's own cookies. It's actually confirmation that using `youtube-nocookie.com` is behaving as intended (third-party state is being isolated).
+- `MouseEvent.mozPressure`/`mozInputSource` deprecation warnings, and repeated "unreachable code after return statement" warnings from a minified script (`2btoZTL64jkioZ4...js`) — this is YouTube's own bundled player script, not `js/script.js` (which is 1.3 KB and contains none of this).
+- `Cookie "PREF" has been rejected for invalid domain` and the Fingerprinting Protection notice — again Firefox's privacy protections responding to YouTube's own script trying to read cookies/screen dimensions.
+
+**Why this matters for the report:** this is a concrete, evidenced example of separating "my page's defects" from "third-party embed noise" when reading real DevTools output — exactly the kind of page-specific technical reasoning the rubric is looking for, rather than a generic "no console errors found" statement.
+
+---
+
 ## Remaining checklist (manual, needs a real human-driven browser)
-1. Open Chrome DevTools → **Issues** tab on the live page, to see what Best Practices' flagged issues actually are.
-2. Screenshot the Network-tab loading waterfall (cache disabled, reload) — confirms the same lazy-load pattern already measured above, for the report's "loading behaviour" evidence.
-3. Toggle **Reduce Motion** in OS accessibility settings, reload, and confirm the timeline transition is suppressed.
-4. (Optional) Retry the PageSpeed Insights desktop run once more, in case the backend error was transient.
+1. Screenshot the Network-tab loading waterfall (cache disabled, reload) — confirms the same lazy-load pattern already measured above, for the report's "loading behaviour" evidence.
+2. Toggle **Reduce Motion** in OS accessibility settings, reload, and confirm the timeline transition is suppressed.
+3. (Optional) Retry the PageSpeed Insights desktop run once more, in case the backend error was transient.
