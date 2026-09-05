@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wan Muhadzdzib — Hackathon Case Studies</title>
+<meta name="description" content="A case study of two hackathons: NASA Space Apps Sarawak 2021 (DebMap) and HackWknd Kota Samarahan 2024 (LearnLog), including a prototype walkthrough and event gallery.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <p class="logo">Wan Muhadzdzib</p>
+    <nav aria-label="Primary">
+      <ul class="nav-list">
+        <li><a href="#journey">Journey</a></li>
+        <li><a href="#demo">Demo</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO / LCP IMAGE ============ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="wrap hero-inner">
+      <div class="hero-text">
+        <h1 id="hero-heading">My Hackathon Journey</h1>
+        <p class="hero-sub">Two hackathons, two very different problems: tracking space debris in real time with NASA Space Apps Sarawak, and helping teachers save time with AI at HackWknd Kota Samarahan. Here's what got built, and how it placed.</p>
+        <a class="btn" href="#journey">See the journey</a>
+      </div>
+      <!--
+        LCP / hero image: loaded eagerly with high priority, explicit
+        width/height matching the largest candidate to avoid layout shift.
+        <picture> gives modern-format (WebP) + JPEG fallback; srcset lets
+        the browser pick the right resolution per viewport.
+      -->
+      <picture>
+        <source
+          srcset="assets/images/hero-480.webp 480w, assets/images/hero-900.webp 900w, assets/images/hero-1200.webp 1200w"
+          sizes="(min-width: 800px) 50vw, 100vw"
+          type="image/webp">
+        <img
+          src="assets/images/hero-900.jpg"
+          srcset="assets/images/hero-480.jpg 480w, assets/images/hero-900.jpg 900w, assets/images/hero-1200.jpg 1200w"
+          sizes="(min-width: 800px) 50vw, 100vw"
+          alt="Wan Muhadzdzib holding the HackWknd 2024 3rd Place Technical Excellent Award certificate"
+          width="1200" height="1600"
+          fetchpriority="high"
+          decoding="async"
+          class="hero-img">
+      </picture>
+    </div>
+  </section>
+
+  <!-- ============ CONTEXT TEXT ============ -->
+  <section class="intro wrap" aria-labelledby="intro-heading">
+    <h2 id="intro-heading">Why hackathons</h2>
+    <p>I've taken part in two hackathons so far: <strong>NASA Space Apps Challenge Sarawak (2021)</strong> and <strong>HackWknd Kota Samarahan (2024)</strong>. Both gave a small team 48–72 hours to turn an unfamiliar problem statement into a working prototype. This page walks through what each event asked for, what we built, and how it placed — including a short walkthrough of the LearnLog prototype from HackWknd.</p>
+  </section>
+
+  <!-- ============ INTERACTIVE TIMELINE ============ -->
+  <section id="journey" class="timeline-section wrap" aria-labelledby="journey-heading">
+    <h2 id="journey-heading">The journey</h2>
+    <p class="section-hint">Select an event to see the problem, the team, and the outcome.</p>
+
+    <div class="timeline" data-timeline>
+      <div class="timeline-tabs" role="tablist" aria-label="Hackathon timeline">
+        <button type="button" class="timeline-tab" id="tab-1" role="tab" aria-selected="true" aria-controls="panel-1">
+          <span class="tab-index">01</span>
+          <span class="tab-label">NASA Space Apps<br><small>2021</small></span>
+        </button>
+        <button type="button" class="timeline-tab" id="tab-2" role="tab" aria-selected="false" aria-controls="panel-2" tabindex="-1">
+          <span class="tab-index">02</span>
+          <span class="tab-label">HackWknd<br><small>2024</small></span>
+        </button>
+      </div>
+
+      <div class="timeline-panels">
+        <article id="panel-1" class="timeline-panel" role="tabpanel" aria-labelledby="tab-1" tabindex="0">
+          <img src="assets/images/timeline-1-900.jpg"
+               srcset="assets/images/timeline-1-480.jpg 480w, assets/images/timeline-1-900.jpg 900w, assets/images/timeline-1-1600.jpg 1600w"
+               sizes="(min-width: 700px) 320px, 100vw"
+               alt="Team ROCKSPACE — Muhammad Kamal, Haidil and Wan Azib — on a video call during NASA Space Apps Sarawak 2021"
+               width="1600" height="901" loading="lazy" decoding="async">
+          <div class="panel-body">
+            <h3>NASA Space Apps Sarawak 2021 — DebMap</h3>
+            <dl class="meta">
+              <div><dt>Team</dt><dd>ROCKSPACE</dd></div>
+              <div><dt>Challenge</dt><dd>Mapping Space Trash in Real Time</dd></div>
+              <div><dt>Tech stack</dt><dd>JavaScript, Cesium.js, Satellite.js</dd></div>
+              <div><dt>Outcome</dt><dd>2nd Runner-Up (Sarawak, Senior) · Global Finalist &amp; Honourable Mention</dd></div>
+            </dl>
+            <p>DebMap plots space debris on a live 3D globe — pulling TLE (Two-Line Element) orbital data from Celestrak, predicting each object's path and speed with Satellite.js, and flagging anything within 100km of Earth as high-risk. Built over the Space Apps weekend with teammates Muhammad Kamal and Haidil, it placed 2nd Runner-Up in the Sarawak Senior Category and went on to be recognised as a Global Finalist and Honourable Mention at the international level.</p>
+            <p class="links">
+              <a href="https://github.com/hi-dil/debMap" target="_blank" rel="noopener noreferrer">View source on GitHub</a>
+              · <a href="https://youtu.be/rBzqudqaouo" target="_blank" rel="noopener noreferrer">Watch the demo video</a>
+            </p>
+          </div>
+        </article>
+
+        <article id="panel-2" class="timeline-panel" role="tabpanel" aria-labelledby="tab-2" tabindex="0" hidden>
+          <img src="assets/images/timeline-2-900.jpg"
+               srcset="assets/images/timeline-2-480.jpg 480w, assets/images/timeline-2-900.jpg 900w, assets/images/timeline-2-1200.jpg 1200w"
+               sizes="(min-width: 700px) 320px, 100vw"
+               alt="Team Visionaries 2.0 holding their RM1,000 Technical Excellent Award cheque at HackWknd Kota Samarahan 2024"
+               width="1200" height="1600" loading="lazy" decoding="async">
+          <div class="panel-body">
+            <h3>HackWknd Kota Samarahan 2024 — LearnLog</h3>
+            <dl class="meta">
+              <div><dt>Team</dt><dd>Visionaries 2.0</dd></div>
+              <div><dt>Theme</dt><dd>AI for Education · UNIMAS, 6–8 Dec 2024</dd></div>
+              <div><dt>Tech / prototype</dt><dd>Figma prototype, AI question-generation pipeline</dd></div>
+              <div><dt>Outcome</dt><dd>3rd Place — Technical Excellent Award (RM1,000)</dd></div>
+            </dl>
+            <p>LearnLog cuts down a teacher's repetitive prep work: upload a syllabus and it generates curriculum-aligned exam questions, and separately detects which syllabus chapter a given question belongs to. It won the Technical Excellent Award (3rd place) among AI-for-Education submissions from across Sarawak.</p>
+            <p class="links">
+              <a href="https://www.figma.com/proto/b8Cpc2dKYBwka1RNa48UHD/HackWknd-LearnLog" target="_blank" rel="noopener noreferrer">View the Figma prototype</a>
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEAM PRESENTATION VIDEO ============ -->
+  <!--
+    Media selection note (for the Q2a write-up): two real ROCKSPACE videos existed —
+    this ~4-min narrated presentation and a shorter raw feature demo
+    (https://youtu.be/rBzqudqaouo). The demo was deliberately rejected to avoid
+    duplicating content already covered narratively here, and to keep this page
+    to one video rather than stacking two on the same topic.
+  -->
+  <section id="demo" class="demo-section wrap" aria-labelledby="demo-heading">
+    <h2 id="demo-heading">Team presentation</h2>
+    <p class="section-hint">Team ROCKSPACE's official presentation for NASA Space Apps Sarawak 2021 — the problem statement, the DebMap solution, and the result.</p>
+
+    <!--
+      Embedded rather than self-hosted: this keeps the page weight down (no
+      multi-MB .mp4 to serve ourselves) at the cost of not controlling the
+      caption track directly — see the Q2d write-up for this trade-off.
+      youtube-nocookie.com avoids setting tracking cookies until playback;
+      no autoplay; native YouTube player controls remain visible.
+    -->
+    <div class="video-embed">
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/ShubBa0KUs4"
+        title="ROCKSPACE — NASA Space Apps Sarawak 2021 team presentation"
+        loading="lazy"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allow="encrypted-media; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <details class="transcript">
+      <summary>Read video transcript</summary>
+      <p>Hi everyone, I'm Wan Muhadzdzib from team ROCKSPACE. ROCKSPACE consists of three team members — here with me are Kamal and Haidil.</p>
+      <p>The challenge we chose is "Mapping Space Trash in Real Time," and the reason is we liked the challenging yet interesting characteristics of this challenge. Despite the difficulties in solving it, we were able to gain new knowledge, improve our communication and problem-solving skills, and — most importantly — gain new experience, since this was our first time joining a hackathon.</p>
+      <p>Did you know that there are over 128 million pieces of space debris floating above us? And did you know this number is increasing over time, as collisions between space debris create even more debris? This collisional cascading phenomenon is known as Kessler syndrome. The increasing amount of space debris above us not only limits our access to space, but also endangers current and future space exploration missions.</p>
+      <p>To tackle this challenge, we came up with a web application called DebMap.</p>
+      <p>As you can see here, I'm demonstrating the prototype of DebMap that we created using Figma. This prototype is the closest picture of what the DebMap web application's user interface should look like.</p>
+      <p>DebMap has the ability to visualize space debris on a virtual globe and classify the space debris based on altitude data in real time. In addition, DebMap can also predict the orbital track of the debris.</p>
+      <p>So how does any of this work? We are using Two-Line Element set data — TLE data for short — obtained from Celestrak. This data is the foundation of DebMap, and it contains all the information required for the visualization, classification and prediction of debris.</p>
+      <p>First, we gather all the debris information and TLE data from the Celestrak catalog. The data is then stored into a JSON file with proper formatting for accessibility purposes. From this JSON file, we use the Cesium.js library to read the data and visualize it on a virtual globe — Cesium.js is a JavaScript library that provides a virtual globe and TLE data visualization.</p>
+      <p>TLE data also provides altitude for the debris, so we can classify the debris and colour-code it based on the safe-Earth distance, which is 100 kilometres. For prediction, we use the Satellite.js library, which uses the SGP4/SDP4 model to calculate the orbital track prediction.</p>
+      <p>Concerning the increasing amount of space debris above us, we hope that this application can provide the correct location of the space debris and classify all of the space debris using the data provided in the Celestrak catalog. We also hope this application can benefit users before they begin their space exploration, and that they can use DebMap to navigate their spacecraft while avoiding debris.</p>
+      <p>We also hope this application will benefit society by helping curb incidents where space trash crashes in a populated area, because that would be catastrophic.</p>
+      <p>With that, that's all from me. Thank you, and see ya — bye!</p>
+    </details>
+  </section>
+
+  <!-- ============ GALLERY ============ -->
+  <section id="gallery" class="gallery-section wrap" aria-labelledby="gallery-heading">
+    <h2 id="gallery-heading">Moments from both events</h2>
+    <div class="gallery-grid">
+      <!-- Responsive images: srcset + sizes so the browser picks the right resolution per viewport. -->
+      <img src="assets/images/gallery-1-800.jpg"
+           srcset="assets/images/gallery-1-400.jpg 400w, assets/images/gallery-1-800.jpg 800w, assets/images/gallery-1-1200.jpg 1200w"
+           sizes="(max-width: 600px) 100vw, (max-width: 1000px) 50vw, 33vw"
+           alt="NASA Space Apps Sarawak 2021 event poster: World's Largest Global Hackathon"
+           width="1200" height="1667" loading="lazy" decoding="async">
+      <img src="assets/images/gallery-2-800.jpg"
+           srcset="assets/images/gallery-2-400.jpg 400w, assets/images/gallery-2-800.jpg 800w, assets/images/gallery-2-1200.jpg 1200w"
+           sizes="(max-width: 600px) 100vw, (max-width: 1000px) 50vw, 33vw"
+           alt="Team ROCKSPACE announced as Senior Category 2nd Runner-Up at the NASA Space Apps Sarawak 2021 closing ceremony"
+           width="1200" height="854" loading="lazy" decoding="async">
+      <img src="assets/images/gallery-3-800.jpg"
+           srcset="assets/images/gallery-3-400.jpg 400w, assets/images/gallery-3-800.jpg 800w, assets/images/gallery-3-1200.jpg 1200w"
+           sizes="(max-width: 600px) 100vw, (max-width: 1000px) 50vw, 33vw"
+           alt="Participants and judges in the NASA Space Apps Sarawak 2021 virtual closing ceremony"
+           width="1200" height="872" loading="lazy" decoding="async">
+      <img src="assets/images/gallery-4-800.jpg"
+           srcset="assets/images/gallery-4-400.jpg 400w, assets/images/gallery-4-800.jpg 800w, assets/images/gallery-4-1200.jpg 1200w"
+           sizes="(max-width: 600px) 100vw, (max-width: 1000px) 50vw, 33vw"
+           alt="HackWknd Kota Samarahan 2024: AI for Education event poster"
+           width="1200" height="1500" loading="lazy" decoding="async">
+    </div>
+  </section>
+
+  <!-- ============ CLOSING / CTA ============ -->
+  <section id="contact" class="cta wrap" aria-labelledby="cta-heading">
+    <h2 id="cta-heading">Let's talk</h2>
+    <p>If you're hiring, or just want to hear more about how DebMap or LearnLog were built, I'd like to hear from you.</p>
+    <a class="btn" href="mailto:your.email@example.com">Email me</a>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>&copy; 2026 Wan Muhadzdzib. Built for TMS6124 Web Authoring, Assignment 2.</p>
+    <p><a href="media-asset-log.md">Media asset log</a></p>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
